@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI COLLEGE HELPDESK | Managed by Team Bug Smasher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.98);
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 0% 0%, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-dark);
+        }
+
+        /* Main Container */
+        .app-shell {
+            width: 600px;
+            max-width: 98%;
+            height: 96vh;
+            background: var(--glass);
+            border-radius: 32px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Header */
+        .app-header {
+            background: var(--primary);
+            padding: 30px 20px 25px;
+            border-radius: 32px 32px 0 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .app-header h1 {
+            color: var(--accent);
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 3px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .app-header p {
+            color: #94a3b8;
+            margin: 8px 0 0;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Language Switcher */
+        .lang-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .lang-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+
+        /* Chat Viewport */
+        .chat-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scrollbar-width: thin;
+        }
+
+        .chat-area::-webkit-scrollbar { width: 5px; }
+        .chat-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .bubble {
+            max-width: 88%;
+            padding: 16px 20px;
+            border-radius: 24px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .bot-bubble {
+            background: white;
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .user-bubble {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+        }
+
+        /* Rich UI Cards */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .menu-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 18px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .menu-item:hover {
+            border-color: var(--accent);
+            background: #f0f9ff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .data-card {
+            background: #ffffff;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            font-size: 13.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .action-btn {
+            display: block;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 800;
+            margin-top: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .action-btn.pay { background: var(--success); }
+        .action-btn.complaint { background: var(--danger); }
+
+        /* Input Zone */
+        .input-zone {
+            padding: 20px 25px;
+            background: white;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            border-radius: 0 0 32px 32px;
+        }
+
+        .input-zone input {
+            flex: 1;
+            padding: 16px 24px;
+            border: 2px solid #f1f5f9;
+            border-radius: 40px;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .input-zone input:focus {
+            border-color: var(--accent);
+        }
+
+        .send-trigger {
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Features */
+        .home-trigger {
+            position: absolute;
+            right: 30px;
+            bottom: 120px;
+            background: var(--accent);
+            color: var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 28px;
+            box-shadow: 0 15px 30px var(--accent-glow);
+            z-index: 10;
+        }
+
+        .team-tag {
+            font-size: 11px;
+            text-align: center;
+            padding: 10px;
+            color: #94a3b8;
+            background: white;
+            border-radius: 0 0 32px 32px;
+        }
+
+        .typing-dot {
+            display: none;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-left: 25px;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <header class="app-header">
+        <h1>AI College Helpdesk</h1>
+        <p>Advanced Academic Assistant</p>
+        <div class="lang-bar">
+            <button class="lang-btn active" id="l-en" onclick="changeLang('en')">English</button>
+            <button class="lang-btn" id="l-hi" onclick="changeLang('hi')">हिंदी</button>
+            <button class="lang-btn" id="l-pa" onclick="changeLang('pa')">ਪੰਜਾਬੀ</button>
+        </div>
+    </header>
+
+    <main class="chat-area" id="chatbox"></main>
+    <div id="status" class="typing-dot">AI is processing...</div>
+
+    <button class="home-trigger" onclick="initChat()">🏠</button>
+
+    <footer class="input-zone">
+        <input type="text" id="userInput" placeholder="Ask about admissions, fees, or courses..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-trigger" onclick="sendMessage()">➤</button>
+    </footer>
+
+    <div class="team-tag">Managed by <b>Team Bug Smasher</b> | System v7.2.0</div>
+</div>
+
+<script>
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('userInput');
+    const status = document.getElementById('status');
+
+    let currentLang = 'en';
+
+    // MULTILINGUAL CONTENT DATABASE
+    const content = {
+        en: {
+            welcome: "Hello! I am your <b>AI Campus Partner</b>. How can I help you excel today?",
+            m_adm: "📝 Admissions 2025",
+            m_fee: "📊 Fee Structure",
+            m_pay: "💳 Pay Online",
+            m_course: "📚 Courses Offered",
+            m_life: "🎭 Campus Life",
+            m_place: "🚀 Placements",
+            m_query: "❓ General Query",
+            m_complaint: "⚠️ File Complaint",
+            adm_title: "🟢 <b>Admissions Open (2025-26)</b>",
+            adm_body: "Our admission portal is currently active. <br><br><b>The Process:</b><br>1. Register Online<br>2. Submit Documents<br>3. Entrance Assessment<br>4. Counseling & Final Fee Payment.",
+            adm_docs: "<b>Mandatory Documents:</b><br>• 10th & 12th Marksheets<br>• Transfer/Migration Certificate<br>• Valid Aadhar ID<br>• 6 Passport Photos",
+            fee_title: "📊 <b>Academic Fee Structure (per sem)</b>",
+            fee_data: "• B.Tech (CS/IT): ₹85,000<br>• BCA / BBA: ₹48,000<br>• MBA: ₹1,05,000<br>• Hostel: ₹45,000/year",
+            pay_title: "💳 <b>Secure Payment Gateway</b>",
+            pay_body: "Transactions are encrypted via SSL. You can pay via UPI, Debit Card, or NetBanking.",
+            query_title: "❓ <b>Help & Queries</b>",
+            query_body: "You can ask about Library timings, Bus routes, or Exam dates. For specific issues, please visit the Admin Block, Room 102.",
+            comp_title: "⚠️ <b>Complaint Redressal</b>",
+            comp_body: "Your concerns are important to us. Please report any issues regarding infrastructure, faculty, or services here.",
+            unknown: "I'm sorry, I didn't catch that. Please use the menu buttons for accurate info."
+        },
+        hi: {
+            welcome: "नमस्ते! मैं आपका <b>AI कैंपस पार्टनर</b> हूं। मैं आपकी क्या सहायता कर सकता हूँ?",
+            m_adm: "📝 प्रवेश 2025",
+            m_fee: "📊 शुल्क विवरण",
+            m_pay: "💳 ऑनलाइन भुगतान",
+            m_course: "📚 पाठ्यक्रम",
+            m_life: "🎭 कैंपस जीवन",
+            m_place: "🚀 प्लेसमेंट",
+            m_query: "❓ सामान्य प्रश्न",
+            m_complaint: "⚠️ शिकायत दर्ज करें",
+            adm_title: "🟢 <b>प्रवेश शुरू (2025-26)</b>",
+            adm_body: "हमारा प्रवेश पोर्टल अभी सक्रिय है। <br><br><b>प्रक्रिया:</b><br>1. ऑनलाइन पंजीकरण<br>2. दस्तावेज जमा करें<br>3. प्रवेश परीक्षा<br>4. काउंसलिंग और अंतिम शुल्क भुगतान।",
+            adm_docs: "<b>आवश्यक दस्तावेज:</b><br>• 10वीं और 12वीं की मार्कशीट<br>• माइग्रेशन सर्टिफिकेट<br>• आधार कार्ड<br>• 6 पासपोर्ट फोटो",
+            fee_title: "📊 <b>शैक्षणिक शुल्क (प्रति सेमेस्टर)</b>",
+            fee_data: "• बी.टेक: ₹85,000<br>• बीसीए / बीबीए: ₹48,000<br>• एमबीए: ₹1,05,000<br>• हॉस्टल: ₹45,000/वर्ष",
+            pay_title: "💳 <b>सुरक्षित भुगतान गेटवे</b>",
+            pay_body: "लेनदेन SSL के माध्यम से एन्क्रिप्टेड हैं। आप UPI या कार्ड से भुगतान कर सकते हैं।",
+            query_title: "❓ <b>सहायता और प्रश्न</b>",
+            query_body: "आप लाइब्रेरी समय, बस रूट या परीक्षा तिथियों के बारे में पूछ सकते हैं।",
+            comp_title: "⚠️ <b>शिकायत निवारण</b>",
+            comp_body: "आपकी समस्याएं हमारे लिए महत्वपूर्ण हैं। कृपया बुनियादी ढांचे या सेवाओं के बारे में यहाँ रिपोर्ट करें।",
+            unknown: "क्षमा करें, मुझे समझ नहीं आया। कृपया मेनू बटन का उपयोग करें।"
+        },
+        pa: {
+            welcome: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ <b>AI ਕੈਂਪਸ ਪਾਰਟਨਰ</b> ਹਾਂ। ਮੈਂ ਅੱਜ ਤੁਹਾਡੀ ਕੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?",
+            m_adm: "📝 ਦਾਖਲਾ 2025",
+            m_fee: "📊 ਫੀਸ ਦਾ ਵੇਰਵਾ",
+            m_pay: "💳 ਫੀਸ ਭਰੋ",
+            m_course: "📚 ਕੋਰਸ ਲਿਸਟ",
+            m_life: "🎭 ਕੈਂਪਸ ਲਾਈਫ",
+            m_place: "🚀 ਪਲੇਸਮੈਂਟ",
+            m_query: "❓ ਪੁੱਛਗਿੱਛ",
+            m_complaint: "⚠️ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ",
+            adm_title: "🟢 <b>ਦਾਖਲਾ ਸ਼ੁਰੂ (2025-26)</b>",
+            adm_body: "ਸਾਡਾ ਦਾਖਲਾ ਪੋਰਟਲ ਇਸ ਸਮੇਂ ਕਿਰਿਆਸ਼ੀਲ ਹੈ। <br><br><b>ਪ੍ਰਕਿਰਿਆ:</b><br>1. ਰਜਿਸਟ੍ਰੇਸ਼ਨ<br>2. ਦਸਤਾਵੇਜ਼ ਅਪਲੋਡ<br>3. ਪ੍ਰਵੇਸ਼ ਪ੍ਰੀਖਿਆ<br>4. ਕਾਉਂਸਲਿੰਗ ਅਤੇ ਫੀਸ ਭੁਗਤਾਨ।",
+            adm_docs: "<b>ਲੋੜੀਂਦੇ ਦਸਤਾਵੇਜ਼:</b><br>• 10ਵੀਂ ਅਤੇ 12ਵੀਂ ਦੀ ਮਾਰਕਸ਼ੀਟ<br>• ਮਾਈਗ੍ਰੇਸ਼ਨ ਸਰਟੀਫਿਕੇਟ<br>• ਆਧਾਰ ਕਾਰਡ<br>• 6 ਪਾਸਪੋਰਟ ਫੋਟੋਆਂ",
+            fee_title: "📊 <b>ਅਕਾਦਮਿਕ ਫੀਸ (ਪ੍ਰਤੀ ਸਮੈਸਟਰ)</b>",
+            fee_data: "• ਬੀ.ਟੈਕ: ₹85,000<br>• ਬੀ.ਸੀ.ਏ: ₹48,000<br>• ਐਮ.ਬੀ.ਏ: ₹1,05,000<br>• ਹੋਸਟਲ: ₹45,000/ਸਾਲ",
+            pay_title: "💳 <b>ਸੁਰੱਖਿਅਤ ਭੁਗਤਾਨ</b>",
+            pay_body: "ਸਾਰੀਆਂ ਟ੍ਰਾਂਜੈਕਸ਼ਨਾਂ SSL ਨਾਲ ਸੁਰੱਖਿਅਤ ਹਨ। ਤੁਸੀਂ UPI ਰਾਹੀਂ ਫੀਸ ਭਰ ਸਕਦੇ ਹੋ।",
+            query_title: "❓ <b>ਮਦਦ ਅਤੇ ਪੁੱਛਗਿੱਛ</b>",
+            query_body: "ਤੁਸੀਂ ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਸਮੇਂ ਜਾਂ ਬੱਸ ਰੂਟਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।",
+            comp_title: "⚠️ <b>ਸ਼ਿਕਾਇਤ ਨਿਵਾਰਨ</b>",
+            comp_body: "ਕਿਰਪਾ ਕਰਕੇ ਕਿਸੇ ਵੀ ਸੇਵਾ ਜਾਂ ਬੁਨਿਆਦੀ ਢਾਂਚੇ ਸੰਬੰਧੀ ਸਮੱਸਿਆਵਾਂ ਦੀ ਰਿਪੋਰਟ ਇੱਥੇ ਕਰੋ।",
+            unknown: "ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਮੇਨੂ ਦੀ ਵਰਤੋਂ ਕਰੋ।"
+        }
+    };
+
+    function initChat() {
+        chatbox.innerHTML = "";
+        addBotMessage(content[currentLang].welcome);
+        renderMenu();
+    }
+
+    function changeLang(l) {
+        currentLang = l;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`l-${l}`).classList.add('active');
+        initChat();
+    }
+
+    function renderMenu() {
+        const c = content[currentLang];
+        const menuHtml = `
+            <div class="menu-grid">
+                <div class="menu-item" onclick="handleAction('${c.m_adm}')">${c.m_adm}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_fee}')">${c.m_fee}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_course}')">${c.m_course}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_pay}')">${c.m_pay}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_life}')">${c.m_life}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_place}')">${c.m_place}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_query}')">${c.m_query}</div>
+                <div class="menu-item" onclick="handleAction('${c.m_complaint}')">${c.m_complaint}</div>
+            </div>
+        `;
+        chatbox.innerHTML += menuHtml;
+        scrollDown();
+    }
+
+    function handleAction(text) {
+        userInput.value = text;
+        sendMessage();
+    }
+
+    function sendMessage() {
+        const msg = userInput.value.trim();
+        if (!msg) return;
+
+        addUserMessage(msg);
+        userInput.value = "";
+        status.style.display = "block";
+
+        setTimeout(() => {
+            status.style.display = "none";
+            processAI(msg.toLowerCase());
+        }, 800);
+    }
+
+    function processAI(m) {
+        const c = content[currentLang];
+
+        if (m.includes('admission') || m.includes('प्रवेश') || m.includes('ਦਾਖਲਾ')) {
+            addBotMessage(c.adm_title);
+            addBotMessage(c.adm_body);
+            addBotMessage(c.adm_docs);
+            chatbox.innerHTML += `<a href="#" class="action-btn">Apply Now Online</a>`;
+        } 
+        else if (m.includes('fee') || m.includes('शुल्क') || m.includes('ਫੀਸ')) {
+            addBotMessage(c.fee_title);
+            addBotMessage(c.fee_data);
+            chatbox.innerHTML += `<div class="data-card">Note: 5% discount on full annual payment.</div>`;
+        }
+        else if (m.includes('pay') || m.includes('भुगतान') || m.includes('ਭੁਗਤਾਨ')) {
+            addBotMessage(c.pay_title);
+            addBotMessage(c.pay_body);
+            chatbox.innerHTML += `<a href="https://rzp.io/l/demo" target="_blank" class="action-btn pay">Secure Payment Portal ➤</a>`;
+        }
+        else if (m.includes('query') || m.includes('प्रश्न') || m.includes('ਪੁੱਛਗਿੱਛ')) {
+            addBotMessage(c.query_title);
+            addBotMessage(c.query_body);
+            chatbox.innerHTML += `<div class="data-card">Common Queries: Bus Timing, Library Card, Exam Form.</div>`;
+        }
+        else if (m.includes('complaint') || m.includes('शिकायत') || m.includes('ਸ਼ਿਕਾਇਤ')) {
+            addBotMessage(c.comp_title);
+            addBotMessage(c.comp_body);
+            chatbox.innerHTML += `<a href="#" class="action-btn complaint">Submit New Complaint</a>`;
+        }
+        else if (m.includes('schol') || m.includes('छात्रवृत्ति') || m.includes('ਸਕਾਲਰਸ਼ਿਪ')) {
+            addBotMessage("🎓 <b>Scholarship Schemes:</b><br>• Merit: 90%+ marks = 50% waiver<br>• Sports: State/National level = 30% waiver<br>• Bug Smasher Tech Award!");
+        }
+        else if (m.includes('place') || m.includes('प्लेसमेंट') || m.includes('ਪਲੇਸਮੈਂਟ')) {
+            addBotMessage("🚀 <b>Placements 2024:</b><br>• Max Package: ₹48 LPA<br>• Average: ₹6.5 LPA<br>• Top Partners: Amazon, Google, TCS.");
+        }
+        else if (m.includes('life') || m.includes('campus')) {
+            addBotMessage("🎭 <b>Campus Environment:</b><br>• 24/7 Library<br>• High-speed Wi-Fi Campus<br>• Robotics & Coding Clubs");
+        }
+        else if (m.includes('course') || m.includes('पाठ्यक्रम')) {
+            addBotMessage("📚 <b>Available Disciplines:</b><br>1. Computer Science (AI/ML/Cloud)<br>2. Information Technology<br>3. Business Management (BBA/MBA)");
+        }
+        else {
+            addBotMessage(c.unknown);
+            renderMenu();
+        }
+        scrollDown();
+    }
+
+    function addBotMessage(t) { chatbox.innerHTML += `<div class="bubble bot-bubble">${t}</div>`; }
+    function addUserMessage(t) { chatbox.innerHTML += `<div class="bubble user-bubble">${t}</div>`; }
+    function scrollDown() { chatbox.scrollTop = chatbox.scrollHeight; }
+
+    initChat();
+</script>
+
+</body>
+</html>
