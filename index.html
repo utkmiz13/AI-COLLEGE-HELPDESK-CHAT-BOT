@@ -1,505 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI COLLEGE HELPDESK | Managed by Team Bug Smasher</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSMNRU AI College Helpdesk</title>
+<style>
+    :root {
+        --primary: #0d47a1;
+        --secondary: #90caf9;
+        --bg: #f0f4fb;
+        --text: #333;
+        --card: #ffffff;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        transition: 0.3s;
+    }
+
+    .dark-mode {
+        --bg: #1a1a1a;
+        --text: #f0f0f0;
+        --card: #2d2d2d;
+        --primary: #1565c0;
+        background: #121212;
+    }
+
+    .chat-container {
+        width: 480px;
+        max-width: 95%;
+        height: 90vh;
+        background: var(--card);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        background: var(--primary);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-btns button {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 5px;
+    }
+
+    .header-btns button:hover {
+        background: rgba(255,255,255,0.4);
+    }
+
+    .chat-box {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: var(--bg);
+        scroll-behavior: smooth;
+    }
+
+    .bot-message, .user-message {
+        padding: 12px 16px;
+        border-radius: 15px;
+        margin-bottom: 12px;
+        max-width: 85%;
+        font-size: 14px;
+        line-height: 1.5;
+        animation: fadeIn 0.4s ease;
+        word-wrap: break-word;
+    }
+
+    .bot-message { 
+        background: var(--card); 
+        color: var(--text); 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        border-bottom-left-radius: 2px; 
+    }
     
-    <style>
-        :root {
-            --primary: #0f172a;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.4);
-            --success: #10b981;
-            --danger: #ef4444;
-            --glass: rgba(255, 255, 255, 0.98);
-            --text-dark: #1e293b;
-            --text-light: #64748b;
-        }
+    .user-message { 
+        background: var(--primary); 
+        color: white; 
+        margin-left: auto; 
+        border-bottom-right-radius: 2px; 
+    }
 
-        * {
-            box-sizing: border-box;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .timestamp {
+        font-size: 10px;
+        text-align: right;
+        margin-top: 4px;
+        opacity: 0.6;
+    }
 
-        body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at 0% 0%, #0f172a 0%, #1e293b 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            color: var(--text-dark);
-        }
+    .quick-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px;
+        background: var(--bg);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        max-height: 100px;
+        overflow-y: auto;
+    }
 
-        /* Main Container */
-        .app-shell {
-            width: 600px;
-            max-width: 98%;
-            height: 96vh;
-            background: var(--glass);
-            border-radius: 32px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.3);
-            backdrop-filter: blur(20px);
-        }
+    .quick-btns button {
+        font-size: 11px;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: var(--secondary);
+        color: #0d47a1;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 600;
+        white-space: nowrap;
+    }
 
-        /* Header */
-        .app-header {
-            background: var(--primary);
-            padding: 30px 20px 25px;
-            border-radius: 32px 32px 0 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    .quick-btns button:hover { 
+        background: var(--primary); 
+        color: white; 
+    }
 
-        .app-header::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            pointer-events: none;
-        }
+    .chat-input { 
+        display: flex; 
+        padding: 10px; 
+        background: var(--card); 
+        border-top: 1px solid #ddd; 
+        gap: 8px;
+    }
+    
+    .chat-input input { 
+        flex: 1; 
+        padding: 12px; 
+        border: 1px solid #ddd; 
+        border-radius: 25px; 
+        outline: none; 
+        padding-left: 20px;
+        font-size: 14px;
+    }
+    
+    .chat-input button { 
+        background: var(--primary); 
+        color: white; 
+        border: none; 
+        width: 45px; 
+        height: 45px; 
+        border-radius: 50%; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 18px;
+        transition: 0.2s;
+    }
 
-        .app-header h1 {
-            color: var(--accent);
-            margin: 0;
-            font-size: 24px;
-            letter-spacing: 3px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+    .chat-input button:hover {
+        background: #0b3d91;
+    }
 
-        .app-header p {
-            color: #94a3b8;
-            margin: 8px 0 0;
-            font-size: 12px;
-            font-weight: 500;
-        }
+    .error-msg {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        border-left: 4px solid #f5c6cb;
+        font-size: 13px;
+    }
 
-        /* Language Switcher */
-        .lang-bar {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 18px;
-            position: relative;
-            z-index: 2;
-        }
+    .success-msg {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        border-left: 4px solid #c3e6cb;
+    }
 
-        .lang-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(5px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
 
-        .lang-btn.active {
-            background: var(--accent);
-            color: var(--primary);
-            border-color: var(--accent);
-        }
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
 
-        /* Chat Viewport */
-        .chat-area {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            background: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            scrollbar-width: thin;
-        }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        .chat-area::-webkit-scrollbar { width: 5px; }
-        .chat-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        .bubble {
-            max-width: 88%;
-            padding: 16px 20px;
-            border-radius: 24px;
-            font-size: 14.5px;
-            line-height: 1.6;
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .bot-bubble {
-            background: white;
-            color: var(--text-dark);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-
-        .user-bubble {
-            background: var(--primary);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
-        }
-
-        /* Rich UI Cards */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            width: 100%;
-            margin-top: 5px;
-        }
-
-        .menu-item {
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 18px;
-            text-align: center;
-            font-weight: 600;
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .menu-item:hover {
-            border-color: var(--accent);
-            background: #f0f9ff;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-
-        .data-card {
-            background: #ffffff;
-            border-left: 4px solid var(--accent);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px 0;
-            font-size: 13.5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .action-btn {
-            display: block;
-            background: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 14px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 800;
-            margin-top: 15px;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        .action-btn.pay { background: var(--success); }
-        .action-btn.complaint { background: var(--danger); }
-
-        /* Input Zone */
-        .input-zone {
-            padding: 20px 25px;
-            background: white;
-            display: flex;
-            align-items: center;
-            border-top: 1px solid #f1f5f9;
-            border-radius: 0 0 32px 32px;
-        }
-
-        .input-zone input {
-            flex: 1;
-            padding: 16px 24px;
-            border: 2px solid #f1f5f9;
-            border-radius: 40px;
-            outline: none;
-            font-size: 15px;
-            font-family: inherit;
-        }
-
-        .input-zone input:focus {
-            border-color: var(--accent);
-        }
-
-        .send-trigger {
-            background: var(--primary);
-            color: var(--accent);
-            border: none;
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            margin-left: 15px;
-            cursor: pointer;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Features */
-        .home-trigger {
-            position: absolute;
-            right: 30px;
-            bottom: 120px;
-            background: var(--accent);
-            color: var(--primary);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-size: 28px;
-            box-shadow: 0 15px 30px var(--accent-glow);
-            z-index: 10;
-        }
-
-        .team-tag {
-            font-size: 11px;
-            text-align: center;
-            padding: 10px;
-            color: #94a3b8;
-            background: white;
-            border-radius: 0 0 32px 32px;
-        }
-
-        .typing-dot {
-            display: none;
-            font-size: 12px;
-            color: var(--text-light);
-            margin-left: 25px;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-    </style>
+    ::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.2);
+        border-radius: 3px;
+    }
+</style>
 </head>
 <body>
 
-<div class="app-shell">
-    <header class="app-header">
-        <h1>AI College Helpdesk</h1>
-        <p>Advanced Academic Assistant</p>
-        <div class="lang-bar">
-            <button class="lang-btn active" id="l-en" onclick="changeLang('en')">English</button>
-            <button class="lang-btn" id="l-hi" onclick="changeLang('hi')">हिंदी</button>
-            <button class="lang-btn" id="l-pa" onclick="changeLang('pa')">ਪੰਜਾਬੀ</button>
+<div class="chat-container">
+    <div class="chat-header">
+        <span>🎓 DSMNRU Helpdesk</span>
+        <div class="header-btns">
+            <button onclick="toggleDarkMode()" id="themeBtn">🌙</button>
+            <button onclick="clearChat()">🗑️</button>
         </div>
-    </header>
+    </div>
 
-    <main class="chat-area" id="chatbox"></main>
-    <div id="status" class="typing-dot">AI is processing...</div>
+    <div class="chat-box" id="chatBox">
+        <div class="bot-message">
+            <b>Welcome to DSMNRU!</b> 👋<br>
+            I'm your AI assistant for <b>Dr. Shakuntala Misra National Rehabilitation University, Lucknow</b>.<br><br>
+            <b>Ask me about:</b><br>
+            📚 Courses & Programs<br>
+            💰 Fees & Scholarships<br>
+            📝 Admissions<br>
+            🏫 Campus & Facilities<br>
+            💼 Placements
+        </div>
+    </div>
 
-    <button class="home-trigger" onclick="initChat()">🏠</button>
+    <div class="quick-btns" id="faqSection">
+        <button onclick="quickAsk('What courses does DSMNRU offer?')">📚 Courses</button>
+        <button onclick="quickAsk('What are the fees?')">💰 Fees</button>
+        <button onclick="quickAsk('How do I apply?')">📝 Admission</button>
+        <button onclick="quickAsk('What facilities?')">🏫 Facilities</button>
+        <button onclick="quickAsk('Contact info')">📞 Contact</button>
+        <button onclick="quickAsk('Tell me about placement')">💼 Placement</button>
+        <button onclick="quickAsk('Scholarship info')">🎓 Scholarships</button>
+    </div>
 
-    <footer class="input-zone">
-        <input type="text" id="userInput" placeholder="Ask about admissions, fees, or courses..." onkeydown="if(event.key==='Enter')sendMessage()">
-        <button class="send-trigger" onclick="sendMessage()">➤</button>
-    </footer>
-
-    <div class="team-tag">Managed by <b>Team Bug Smasher</b> | System v7.2.0</div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Ask about college..." autocomplete="off">
+        <button onclick="sendMessage()">➤</button>
+    </div>
 </div>
 
 <script>
-    const chatbox = document.getElementById('chatbox');
-    const userInput = document.getElementById('userInput');
-    const status = document.getElementById('status');
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+    const API_KEY = "AIzaSyDC27Mamg5xuIF9aUsABI0Dbx6ENhBFWB8";
 
-    let currentLang = 'en';
-
-    // MULTILINGUAL CONTENT DATABASE
-    const content = {
-        en: {
-            welcome: "Hello! I am your <b>AI Campus Partner</b>. How can I help you excel today?",
-            m_adm: "📝 Admissions 2025",
-            m_fee: "📊 Fee Structure",
-            m_pay: "💳 Pay Online",
-            m_course: "📚 Courses Offered",
-            m_life: "🎭 Campus Life",
-            m_place: "🚀 Placements",
-            m_query: "❓ General Query",
-            m_complaint: "⚠️ File Complaint",
-            adm_title: "🟢 <b>Admissions Open (2025-26)</b>",
-            adm_body: "Our admission portal is currently active. <br><br><b>The Process:</b><br>1. Register Online<br>2. Submit Documents<br>3. Entrance Assessment<br>4. Counseling & Final Fee Payment.",
-            adm_docs: "<b>Mandatory Documents:</b><br>• 10th & 12th Marksheets<br>• Transfer/Migration Certificate<br>• Valid Aadhar ID<br>• 6 Passport Photos",
-            fee_title: "📊 <b>Academic Fee Structure (per sem)</b>",
-            fee_data: "• B.Tech (CS/IT): ₹85,000<br>• BCA / BBA: ₹48,000<br>• MBA: ₹1,05,000<br>• Hostel: ₹45,000/year",
-            pay_title: "💳 <b>Secure Payment Gateway</b>",
-            pay_body: "Transactions are encrypted via SSL. You can pay via UPI, Debit Card, or NetBanking.",
-            query_title: "❓ <b>Help & Queries</b>",
-            query_body: "You can ask about Library timings, Bus routes, or Exam dates. For specific issues, please visit the Admin Block, Room 102.",
-            comp_title: "⚠️ <b>Complaint Redressal</b>",
-            comp_body: "Your concerns are important to us. Please report any issues regarding infrastructure, faculty, or services here.",
-            unknown: "I'm sorry, I didn't catch that. Please use the menu buttons for accurate info."
-        },
-        hi: {
-            welcome: "नमस्ते! मैं आपका <b>AI कैंपस पार्टनर</b> हूं। मैं आपकी क्या सहायता कर सकता हूँ?",
-            m_adm: "📝 प्रवेश 2025",
-            m_fee: "📊 शुल्क विवरण",
-            m_pay: "💳 ऑनलाइन भुगतान",
-            m_course: "📚 पाठ्यक्रम",
-            m_life: "🎭 कैंपस जीवन",
-            m_place: "🚀 प्लेसमेंट",
-            m_query: "❓ सामान्य प्रश्न",
-            m_complaint: "⚠️ शिकायत दर्ज करें",
-            adm_title: "🟢 <b>प्रवेश शुरू (2025-26)</b>",
-            adm_body: "हमारा प्रवेश पोर्टल अभी सक्रिय है। <br><br><b>प्रक्रिया:</b><br>1. ऑनलाइन पंजीकरण<br>2. दस्तावेज जमा करें<br>3. प्रवेश परीक्षा<br>4. काउंसलिंग और अंतिम शुल्क भुगतान।",
-            adm_docs: "<b>आवश्यक दस्तावेज:</b><br>• 10वीं और 12वीं की मार्कशीट<br>• माइग्रेशन सर्टिफिकेट<br>• आधार कार्ड<br>• 6 पासपोर्ट फोटो",
-            fee_title: "📊 <b>शैक्षणिक शुल्क (प्रति सेमेस्टर)</b>",
-            fee_data: "• बी.टेक: ₹85,000<br>• बीसीए / बीबीए: ₹48,000<br>• एमबीए: ₹1,05,000<br>• हॉस्टल: ₹45,000/वर्ष",
-            pay_title: "💳 <b>सुरक्षित भुगतान गेटवे</b>",
-            pay_body: "लेनदेन SSL के माध्यम से एन्क्रिप्टेड हैं। आप UPI या कार्ड से भुगतान कर सकते हैं।",
-            query_title: "❓ <b>सहायता और प्रश्न</b>",
-            query_body: "आप लाइब्रेरी समय, बस रूट या परीक्षा तिथियों के बारे में पूछ सकते हैं।",
-            comp_title: "⚠️ <b>शिकायत निवारण</b>",
-            comp_body: "आपकी समस्याएं हमारे लिए महत्वपूर्ण हैं। कृपया बुनियादी ढांचे या सेवाओं के बारे में यहाँ रिपोर्ट करें।",
-            unknown: "क्षमा करें, मुझे समझ नहीं आया। कृपया मेनू बटन का उपयोग करें।"
-        },
-        pa: {
-            welcome: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡਾ <b>AI ਕੈਂਪਸ ਪਾਰਟਨਰ</b> ਹਾਂ। ਮੈਂ ਅੱਜ ਤੁਹਾਡੀ ਕੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?",
-            m_adm: "📝 ਦਾਖਲਾ 2025",
-            m_fee: "📊 ਫੀਸ ਦਾ ਵੇਰਵਾ",
-            m_pay: "💳 ਫੀਸ ਭਰੋ",
-            m_course: "📚 ਕੋਰਸ ਲਿਸਟ",
-            m_life: "🎭 ਕੈਂਪਸ ਲਾਈਫ",
-            m_place: "🚀 ਪਲੇਸਮੈਂਟ",
-            m_query: "❓ ਪੁੱਛਗਿੱਛ",
-            m_complaint: "⚠️ ਸ਼ਿਕਾਇਤ ਦਰਜ ਕਰੋ",
-            adm_title: "🟢 <b>ਦਾਖਲਾ ਸ਼ੁਰੂ (2025-26)</b>",
-            adm_body: "ਸਾਡਾ ਦਾਖਲਾ ਪੋਰਟਲ ਇਸ ਸਮੇਂ ਕਿਰਿਆਸ਼ੀਲ ਹੈ। <br><br><b>ਪ੍ਰਕਿਰਿਆ:</b><br>1. ਰਜਿਸਟ੍ਰੇਸ਼ਨ<br>2. ਦਸਤਾਵੇਜ਼ ਅਪਲੋਡ<br>3. ਪ੍ਰਵੇਸ਼ ਪ੍ਰੀਖਿਆ<br>4. ਕਾਉਂਸਲਿੰਗ ਅਤੇ ਫੀਸ ਭੁਗਤਾਨ।",
-            adm_docs: "<b>ਲੋੜੀਂਦੇ ਦਸਤਾਵੇਜ਼:</b><br>• 10ਵੀਂ ਅਤੇ 12ਵੀਂ ਦੀ ਮਾਰਕਸ਼ੀਟ<br>• ਮਾਈਗ੍ਰੇਸ਼ਨ ਸਰਟੀਫਿਕੇਟ<br>• ਆਧਾਰ ਕਾਰਡ<br>• 6 ਪਾਸਪੋਰਟ ਫੋਟੋਆਂ",
-            fee_title: "📊 <b>ਅਕਾਦਮਿਕ ਫੀਸ (ਪ੍ਰਤੀ ਸਮੈਸਟਰ)</b>",
-            fee_data: "• ਬੀ.ਟੈਕ: ₹85,000<br>• ਬੀ.ਸੀ.ਏ: ₹48,000<br>• ਐਮ.ਬੀ.ਏ: ₹1,05,000<br>• ਹੋਸਟਲ: ₹45,000/ਸਾਲ",
-            pay_title: "💳 <b>ਸੁਰੱਖਿਅਤ ਭੁਗਤਾਨ</b>",
-            pay_body: "ਸਾਰੀਆਂ ਟ੍ਰਾਂਜੈਕਸ਼ਨਾਂ SSL ਨਾਲ ਸੁਰੱਖਿਅਤ ਹਨ। ਤੁਸੀਂ UPI ਰਾਹੀਂ ਫੀਸ ਭਰ ਸਕਦੇ ਹੋ।",
-            query_title: "❓ <b>ਮਦਦ ਅਤੇ ਪੁੱਛਗਿੱਛ</b>",
-            query_body: "ਤੁਸੀਂ ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਸਮੇਂ ਜਾਂ ਬੱਸ ਰੂਟਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।",
-            comp_title: "⚠️ <b>ਸ਼ਿਕਾਇਤ ਨਿਵਾਰਨ</b>",
-            comp_body: "ਕਿਰਪਾ ਕਰਕੇ ਕਿਸੇ ਵੀ ਸੇਵਾ ਜਾਂ ਬੁਨਿਆਦੀ ਢਾਂਚੇ ਸੰਬੰਧੀ ਸਮੱਸਿਆਵਾਂ ਦੀ ਰਿਪੋਰਟ ਇੱਥੇ ਕਰੋ।",
-            unknown: "ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਮੇਨੂ ਦੀ ਵਰਤੋਂ ਕਰੋ।"
-        }
+    // College Knowledge Base
+    const knowledgeBase = {
+        courses: "DSMNRU offers 40+ undergraduate, postgraduate and doctoral programs including: B.Tech (CSE, AI-DS, ECE, Mechanical, Civil, Electrical), B.Com, B.Sc, BA, BBA, Law, BASLP, MBA, MCA, M.Tech, M.Sc, M.Com, LLM, M.Ed (Special Education), B.Ed (Special Education), BPO, MPO, and PhD programs across multiple disciplines.",
+        
+        fees: "Approximate fees (per year): B.Tech ₹90,000-1.2L | MBA ₹35,000-45,000 | MCA ₹30,000-40,000 | BA/B.Sc/B.Com ₹8,000-15,000 | Law ₹20,000-30,000 | BASLP ₹12,000-35,000. NOTE: Divyang (disabled) students get significant fee waivers and scholarships!",
+        
+        admission: "UG Admissions: Through JEE Main / CUET-UG entrance exam + counseling. PG Admissions: Through CUET-PG or merit-based. PhD: Master's degree + entrance exam/interview. 50% seats are reserved for differently-abled students in all programs. Cut-offs vary by category.",
+        
+        facilities: "Campus facilities include: Barrier-free 131-acre campus with ramps & elevators | Library with 4000+ books & Braille resources | Smart classrooms with WiFi | Separate boys & girls hostels | Medical center (24/7) | Physiotherapy unit | Sports complex | Cafeteria | IT labs | Assistive technology labs.",
+        
+        placement: "Average package: ₹3.2-4.8 LPA. Top placements: MBA up to ₹12.16 LPA, B.Tech up to ₹9 LPA. Recruiters: Wipro, HCL, IBM, Amazon, Dabur, Axis Bank, HDFC, Reliance. Active placement cell with training & MoUs.",
+        
+        scholarships: "Available scholarships: NHFDC Scholarship (for ≥40% disability) | UP State Scholarship | Central Govt Divyang Scholarships | Fee reimbursement (category-wise) | Merit-based scholarships. Divyang students receive tuition waiver + maintenance + book support.",
+        
+        contact: "Address: Mohaan Road, Lucknow, UP - 226017 | Website: https://dsmru.up.nic.in | Registrar: +91 8887222002 | Registrar Email: registrar@dsmnru.ac.in | VC: Prof. Sanjay Singh (vc@dsmnru.ac.in)",
+        
+        about: "DSMNRU is a state university established in 2009, recognized by UGC and NAAC accredited. It's India's premier institution for inclusive education with 50% horizontal reservation for differently-abled students. Focus: Barrier-free education, rehabilitation, special education. Notable: 2000+ free Braille textbooks printed, sign language notices for hearing-impaired, scented pathways for visually impaired.",
+        
+        antiRagging: "DSMNRU has a ZERO TOLERANCE policy against ragging. The university strictly enforces anti-ragging rules to ensure a safe and secure campus environment for all students. Any incidents must be reported immediately to college authorities.",
+        
+        unique: "DSMNRU is unique for: India's only rehabilitation-focused university | 50% disabled student reservation | 2000+ Braille books published | Sign language translation of notices | Scented pathway navigation for blind students | Para-sports excellence | Barrier-free campus design | Specialized assistive tech labs."
     };
 
-    function initChat() {
-        chatbox.innerHTML = "";
-        addBotMessage(content[currentLang].welcome);
-        renderMenu();
+    // Initialize
+    window.addEventListener("load", () => {
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add('dark-mode');
+            document.getElementById("themeBtn").innerText = "☀️";
+        }
+    });
+
+    userInput.addEventListener("keypress", (e) => { 
+        if (e.key === "Enter") sendMessage(); 
+    });
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        document.getElementById("themeBtn").innerText = isDark ? "☀️" : "🌙";
+        localStorage.setItem("darkMode", isDark);
     }
 
-    function changeLang(l) {
-        currentLang = l;
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`l-${l}`).classList.add('active');
-        initChat();
+    function clearChat() {
+        chatBox.innerHTML = `<div class="bot-message"><b>Chat cleared!</b> 👋<br>How can I help you with DSMNRU?</div>`;
     }
 
-    function renderMenu() {
-        const c = content[currentLang];
-        const menuHtml = `
-            <div class="menu-grid">
-                <div class="menu-item" onclick="handleAction('${c.m_adm}')">${c.m_adm}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_fee}')">${c.m_fee}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_course}')">${c.m_course}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_pay}')">${c.m_pay}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_life}')">${c.m_life}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_place}')">${c.m_place}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_query}')">${c.m_query}</div>
-                <div class="menu-item" onclick="handleAction('${c.m_complaint}')">${c.m_complaint}</div>
-            </div>
-        `;
-        chatbox.innerHTML += menuHtml;
-        scrollDown();
+    function timeNow() {
+        return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     }
 
-    function handleAction(text) {
+    function quickAsk(text) {
         userInput.value = text;
         sendMessage();
+    }
+
+    // Smart response matcher
+    function getSmartResponse(userMsg) {
+        const msg = userMsg.toLowerCase();
+        
+        if (msg.includes("course") || msg.includes("program") || msg.includes("b.tech") || msg.includes("mba")) {
+            return knowledgeBase.courses;
+        }
+        if (msg.includes("fee") || msg.includes("cost") || msg.includes("price")) {
+            return knowledgeBase.fees;
+        }
+        if (msg.includes("admission") || msg.includes("apply") || msg.includes("entrance") || msg.includes("cuet") || msg.includes("jee")) {
+            return knowledgeBase.admission;
+        }
+        if (msg.includes("facility") || msg.includes("campus") || msg.includes("hostel") || msg.includes("library") || msg.includes("sports")) {
+            return knowledgeBase.facilities;
+        }
+        if (msg.includes("placement") || msg.includes("job") || msg.includes("package") || msg.includes("recruit")) {
+            return knowledgeBase.placement;
+        }
+        if (msg.includes("scholarship") || msg.includes("financial") || msg.includes("grant")) {
+            return knowledgeBase.scholarships;
+        }
+        if (msg.includes("contact") || msg.includes("phone") || msg.includes("email") || msg.includes("address") || msg.includes("website")) {
+            return knowledgeBase.contact;
+        }
+        if (msg.includes("ragging") || msg.includes("safety") || msg.includes("discipline")) {
+            return knowledgeBase.antiRagging;
+        }
+        if (msg.includes("unique") || msg.includes("special") || msg.includes("why dsmnru") || msg.includes("disabled") || msg.includes("divyang")) {
+            return knowledgeBase.unique;
+        }
+        if (msg.includes("about") || msg.includes("dsmnru") || msg.includes("university")) {
+            return knowledgeBase.about;
+        }
+        
+        return null;
     }
 
     function sendMessage() {
         const msg = userInput.value.trim();
         if (!msg) return;
 
-        addUserMessage(msg);
+        // Add user message
+        chatBox.innerHTML += `<div class="user-message">${escapeHtml(msg)}<div class="timestamp">${timeNow()}</div></div>`;
         userInput.value = "";
-        status.style.display = "block";
+        
+        // Show typing indicator
+        const typing = document.createElement("div");
+        typing.className = "bot-message";
+        typing.id = "typing";
+        typing.innerHTML = "<i>✨ Checking knowledge base...</i>";
+        chatBox.appendChild(typing);
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-        setTimeout(() => {
-            status.style.display = "none";
-            processAI(msg.toLowerCase());
-        }, 800);
+        // First try to get answer from knowledge base
+        const smartResponse = getSmartResponse(msg);
+        
+        // Remove typing indicator
+        const typingEl = document.getElementById("typing");
+        if (typingEl) typingEl.remove();
+
+        if (smartResponse) {
+            // Use knowledge base response immediately
+            chatBox.innerHTML += `<div class="bot-message">${escapeHtml(smartResponse).replace(/\n/g, '<br>')}<div class="timestamp">${timeNow()}</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } else {
+            // For other questions, try Gemini API or give college-only warning
+            callGeminiAPI(msg);
+        }
     }
 
-    function processAI(m) {
-        const c = content[currentLang];
+    async function callGeminiAPI(userMessage) {
+        try {
+            const systemPrompt = `You are a helpful AI for DSMNRU (Dr. Shakuntala Misra National Rehabilitation University). 
+            
+STRICT RULE: If the user asks about ANYTHING NOT related to DSMNRU college (like celebrities, news, general topics, current affairs, etc.), respond ONLY with:
+"👋 I'm here to help with DSMNRU college questions only! Please ask about courses, fees, admission, facilities, placement, scholarships, or contact information."
 
-        if (m.includes('admission') || m.includes('प्रवेश') || m.includes('ਦਾਖਲਾ')) {
-            addBotMessage(c.adm_title);
-            addBotMessage(c.adm_body);
-            addBotMessage(c.adm_docs);
-            chatbox.innerHTML += `<a href="#" class="action-btn">Apply Now Online</a>`;
-        } 
-        else if (m.includes('fee') || m.includes('शुल्क') || m.includes('ਫੀਸ')) {
-            addBotMessage(c.fee_title);
-            addBotMessage(c.fee_data);
-            chatbox.innerHTML += `<div class="data-card">Note: 5% discount on full annual payment.</div>`;
+Do NOT provide any information unrelated to DSMNRU. Keep responses brief and friendly.`;
+
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: systemPrompt + "\n\nUser: " + userMessage
+                            }]
+                        }]
+                    })
+                }
+            );
+
+            let botReply = "Unable to get response. ";
+
+            if (response.ok) {
+                const data = await response.json();
+                botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to generate response";
+            } else {
+                // If API fails, give friendly fallback
+                botReply = "👋 I'm here to help with DSMNRU college questions! Ask about courses, fees, admission, facilities, or contact details.";
+            }
+
+            // Add bot response
+            chatBox.innerHTML += `<div class="bot-message">${escapeHtml(botReply).replace(/\n/g, '<br>')}<div class="timestamp">${timeNow()}</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        } catch (error) {
+            // Graceful fallback
+            const fallbackMsg = "👋 I'm here for DSMNRU college questions! Try asking about courses, fees, admission, placement, or facilities.";
+            chatBox.innerHTML += `<div class="bot-message">${fallbackMsg}<div class="timestamp">${timeNow()}</div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
-        else if (m.includes('pay') || m.includes('भुगतान') || m.includes('ਭੁਗਤਾਨ')) {
-            addBotMessage(c.pay_title);
-            addBotMessage(c.pay_body);
-            chatbox.innerHTML += `<a href="https://rzp.io/l/demo" target="_blank" class="action-btn pay">Secure Payment Portal ➤</a>`;
-        }
-        else if (m.includes('query') || m.includes('प्रश्न') || m.includes('ਪੁੱਛਗਿੱਛ')) {
-            addBotMessage(c.query_title);
-            addBotMessage(c.query_body);
-            chatbox.innerHTML += `<div class="data-card">Common Queries: Bus Timing, Library Card, Exam Form.</div>`;
-        }
-        else if (m.includes('complaint') || m.includes('शिकायत') || m.includes('ਸ਼ਿਕਾਇਤ')) {
-            addBotMessage(c.comp_title);
-            addBotMessage(c.comp_body);
-            chatbox.innerHTML += `<a href="#" class="action-btn complaint">Submit New Complaint</a>`;
-        }
-        else if (m.includes('schol') || m.includes('छात्रवृत्ति') || m.includes('ਸਕਾਲਰਸ਼ਿਪ')) {
-            addBotMessage("🎓 <b>Scholarship Schemes:</b><br>• Merit: 90%+ marks = 50% waiver<br>• Sports: State/National level = 30% waiver<br>• Bug Smasher Tech Award!");
-        }
-        else if (m.includes('place') || m.includes('प्लेसमेंट') || m.includes('ਪਲੇਸਮੈਂਟ')) {
-            addBotMessage("🚀 <b>Placements 2024:</b><br>• Max Package: ₹48 LPA<br>• Average: ₹6.5 LPA<br>• Top Partners: Amazon, Google, TCS.");
-        }
-        else if (m.includes('life') || m.includes('campus')) {
-            addBotMessage("🎭 <b>Campus Environment:</b><br>• 24/7 Library<br>• High-speed Wi-Fi Campus<br>• Robotics & Coding Clubs");
-        }
-        else if (m.includes('course') || m.includes('पाठ्यक्रम')) {
-            addBotMessage("📚 <b>Available Disciplines:</b><br>1. Computer Science (AI/ML/Cloud)<br>2. Information Technology<br>3. Business Management (BBA/MBA)");
-        }
-        else {
-            addBotMessage(c.unknown);
-            renderMenu();
-        }
-        scrollDown();
     }
 
-    function addBotMessage(t) { chatbox.innerHTML += `<div class="bubble bot-bubble">${t}</div>`; }
-    function addUserMessage(t) { chatbox.innerHTML += `<div class="bubble user-bubble">${t}</div>`; }
-    function scrollDown() { chatbox.scrollTop = chatbox.scrollHeight; }
-
-    initChat();
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
 </script>
 
 </body>
